@@ -9,36 +9,20 @@
 # sobre a quantidade de dados transmitidos e recebidos nas interfaces de rede selecionadas, e sobre as
 # respectivas taxas de transferência
 # 
-# Manuel Diaz       103645
-# Tiago Carvalho    104142
+# Liliana Ribeiro 108713
+# Gonçalo Sousa 108133
 #--------------------------------------------------------------------------------------------------------------------------------
 
 # Inicialização de Arrays
-declare -A COMM #FAZ ALGUMA MERDA
-declare -A USER # Array Associativo para guardar os valores de USER de cada interface de rede, na unidade de visualização desejada.
-declare -A PID # Array Associativo para guardar os valores de PID de cada interface de rede, na unidade de visualização desejada.
-declare -A rxb2 # Array Associativo para guardar os valores de RX2 de cada interface de rede, em bytes.
-declare -A tx # Array Associativo para guardar os valores de TX de cada interface de rede, na unidade de visualização desejada.
-declare -A txb1 # Array Associativo para guardar os valores de TX1 de cada interface de rede, em bytes.
-declare -A txb2 # Array Associativo para guardar os valores de TX2 de cada interface de rede, em bytes.
-declare -A trate # Array Associativo para guardar os valores de TRATE de cada interface de rede, na unidade de visualização desejada.
-declare -A rrate # Array Associativo para guardar os valores de RRATE de cada interface de rede, na unidade de visualização desejada.
-declare -A txtot # Array Associativo para guardar os valores de TXTOT de cada interface de rede, na unidade de visualização desejada.
-declare -A rxtot # Array Associativo para guardar os valores de RXTOT de cada interface de rede, na unidade de visualização desejada.
 
-# Inicilização de variáveis
-nre="^[0-9]+(\.[0-9]*)?$" # Expressão regular usada para números.   
-i=0 # Usada para verificar a condição de uso de apenas um dos -b, -k ou -m.
-d=0 # Usada para verificar a condição do argumento passado entre -b, -k ou -m.
-m=0 # Usada para verificar a condição de uso de apenas um dos -t, -r, -T ou -R.
-l=0 # Usada para transportar valor do loop de -l.
-p=-1 # Usada para transportar o número de interfaces a visualizar de -p.
-ctr=1 # Usada para calcular o valor de controlo dos argumentos.
-k=1 # Usada para determinar a coluna da tabela relevante à ordenação.
-c="" # Usada para transportar a expressão regular passada em -c
-reverse="" # Usada para alternar a ordenação entre decrescente e crescente.
-t=${@: -1} # Usada para guardar o último argumento e usá-lo em todo o programa.
-#--------------------------------------------------------------------------------------------------------------------------------
+#Arrays
+declare -A arrayPID=() # Array Associativo: Guarda as informações de cada processo, sendo a 'key' o PID
+declare -A arrayOpc=()   # Array Associativo: Guarda a informação das opções passadas como argumentos na chamada da função
+declare -A arrayRChar=() # Guarda as linhas rchar 
+declare -A arrayWChar=() # Guarda as linhas wchar
+
+i=0 #iniciação da variável i, usada na condição de verificação de opçoes de ordenac
+re='^[0-9]+([.][0-9]+)?$'
 
 function usage() { # Menu de execução do programa.
     echo "Menu de Uso e Execução do Programa."
