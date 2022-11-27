@@ -14,9 +14,9 @@
 #--------------------------------------------------------------------------------------------------------------------------------
 
 # Inicialização de Arrays
-declare -A optsOrd # Array Associativo para tratamento das opções selecionadas. Contem informações sobre os argumentos passados.
-declare -A rx # Array Associativo para guardar os valores de RX de cada interface de rede, na unidade de visualização desejada.
-declare -A rxb1 # Array Associativo para guardar os valores de RX1 de cada interface de rede, em bytes.
+declare -A COMM #FAZ ALGUMA MERDA
+declare -A USER # Array Associativo para guardar os valores de USER de cada interface de rede, na unidade de visualização desejada.
+declare -A PID # Array Associativo para guardar os valores de PID de cada interface de rede, na unidade de visualização desejada.
 declare -A rxb2 # Array Associativo para guardar os valores de RX2 de cada interface de rede, em bytes.
 declare -A tx # Array Associativo para guardar os valores de TX de cada interface de rede, na unidade de visualização desejada.
 declare -A txb1 # Array Associativo para guardar os valores de TX1 de cada interface de rede, em bytes.
@@ -42,19 +42,16 @@ t=${@: -1} # Usada para guardar o último argumento e usá-lo em todo o programa
 
 function usage() { # Menu de execução do programa.
     echo "Menu de Uso e Execução do Programa."
-    echo "    -c [NETIF] : Seleção das interfaces de rede, [NETIF], a visualizar através de uma expressão regular."
-    echo "    -b         : Visualização das quantidades em bytes."
-    echo "    -k         : Visualização das quantidades em kilobytes."
-    echo "    -m         : Visualização das quantidades em megabytes."
-    echo "    -p [n]     : Número, [n], de interfaces de redes a visualizar."
-    echo "    -t         : Ordenação da tabela por TX (decrescente)."
-    echo "    -r         : Ordenação da tabela por RX (decrescente).".
-    echo "    -T         : Ordenação da tabela por TRATE (decrescente)."
-    echo "    -R         : Ordenação da tabela por RRATE (decrescente)."
-    echo "    -v         : Ordenação reversa (crescente)."
-    echo "    -l         : Loop de execução do programa a cada [s] segundos."
-    echo "ALERTAS -> As opções -t,-r,-T,-R não podem ser utilizadas em simultâneo."
-    echo "           O último argumento passado tem de o período de tempo desejado (segundos)."
+    echo "    -c         : Seleção  dos  processos  a  visualizar  pode  ser  realizada através de uma expressão regular."
+    echo "    -s          : Seleção de processos a visualizar num periodo temporal - data mínima"
+    echo "    -e          : Seleção de processos a visualizar num periodo temporal - data máxima"
+    echo "    -u          : Seleção de processos a visualizar através do nome do utilizador"
+    echo "    -m          : Seleção de processos a visualizar através de uma gama de pids"
+    echo "    -M          : Seleção de processos a visualizar através de uma gama de pids"
+    echo "    -p          : Número de processos a visualizar"
+    echo "    -r          : Ordenação reversa"
+    echo "    -w          : Ordenação da tabela por valores de escrita"
+
 }
 function getTable() { # Função principal do programa. Obtém os valores desejados, ordena-os e imprimi-os.
     for net in /sys/class/net/[[:alnum:]]*; do # Procurar por todas as interfaces de rede disponiveis.
