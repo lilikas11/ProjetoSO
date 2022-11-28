@@ -2,12 +2,13 @@
 
 #--------------------------------------------------------------------------------------------------------------------------------
 #                                             Trabalho 1
-#                             Monitorização de interfaces de rede em bash
+#                             Taxas de Leitura/Escrita de processos em bash
 #
 # Guião
-#    O objectivo do trabalho é o desenvolvimento de um script em bash que apresenta estatísticas
-# sobre a quantidade de dados transmitidos e recebidos nas interfaces de rede selecionadas, e sobre as
-# respectivas taxas de transferência
+#    O objetivo do trabalho é o desenvolvimento de um script em bash para obter estatísticas sobre
+#    as leituras e escritas que os processos estão a efetuar. Esta ferramenta permite visualizar o número total
+#    de bytes de I/O que um processo leu/escreveu e também a taxa de leitura/escrita correspondente aos
+#    últimos s segundos para uma seleção de processos (o valor de s é passado como parâmetro).
 # 
 # Liliana Ribeiro 108713
 # Gonçalo Sousa 108133
@@ -21,7 +22,7 @@ declare -A arrayOpc=()   # Array Associativo: Guarda a informação das opções
 declare -A arrayRChar=() # Guarda as linhas rchar 
 declare -A arrayWChar=() # Guarda as linhas wchar
 
-i=0 #iniciação da variável i, usada na condição de verificação de opçoes de ordenac
+ordem=0 #iniciação da variável ordem, usada na condição de verificação de opçoes de ordenac
 
 function menu() { # Menu de execução do programa.
     echo "Menu de Uso e Execução do Programa."
@@ -38,79 +39,80 @@ function menu() { # Menu de execução do programa.
 }
 
 #Tratamentos das opçoes passadas como argumentos
-while getValues "::u:se:mcwrcp" option; do
+while getopts "::u:se:mcwrcp" option; do
 
     #Adicionar ao array argOpt as opcoes passadas ao correr o procstat.sh, caso existam adiciona as que são passadas, caso não, adiciona "nada"
     if [[ -z "$OPTARG" ]]; then
-        argOpt[$option]="blank"
+        arrayOpc[$option]="blank"
     else
-        argOpt[$option]=${OPTARG}
+        arrayOpc[$option]=${OPTARG}
     fi
 
     case $option in
     c) #Seleção de processos a utilizar atraves de uma expressão regular
-        str=${argOpt['c']}
-        if [[ $str == 'nada' || ${str:0:1} == "-" || $str =~ $re ]]; then
-            echo "Argumento de '-c' não foi preenchido, foi introduzido argumento inválido ou chamou sem '-' atrás da opção passada." >&2
+        str=${arrayOpc['c']};;
+    s) #Seleção de processos a visualizar num periodo temporal - data mínima
+        str=${arrayOpc['s']}
+        regData='^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)) +(0?[1-9]|[12][0-9]|3[01]) +([01]?[0-9]|2[0-3]):[0-5][0-9]'
+        if [["$str" =~ $regData ]]; then
+            echo "Argumento de '-s' não foi preenchido, foi introduzido argumento inválido ou chamou sem '-' atrás da opção passada." >&2
             menu
             exit 1
         fi
         ;;
-    s) #Seleção de processos a visualizar num periodo temporal - data mínima
-        str=${argOpt['s']}
-        regData='^((Jan(uary)?|Feb(ruary)?|Mar(ch)?|Apr(il)?|May|Jun(e)?|Jul(y)?|Aug(ust)?|Sep(tember)?|Oct(ober)?|Nov(ember)?|Dec(ember)?)) +[0-9]{1,2} +[0-9]{1,2}:[0-9]{1,2}'
-        if [[ $str == 'nada' || ${str:0:1} == "-" || $str =~ $re || ! "$str" =~ $regData ]]; then
-            echo "Argumento de '-s' não foi preenchido, foi introduzido argumento inválido ou chamou sem '-' atrás da opção passada." >&2
-            meu
-            exit 1
-        fi
-        ;;
     e) #Seleção de processos a visualizar num periodo temporal - data máxima
-        str=${argOpt['e']}
-        regData='^((Jan(uary)?|Feb(ruary)?|Mar(ch)?|Apr(il)?|May|Jun(e)?|Jul(y)?|Aug(ust)?|Sep(tember)?|Oct(ober)?|Nov(ember)?|Dec(ember)?)) +[0-9]{1,2} +[0-9]{1,2}:[0-9]{1,2}'
-        if [[ $str == 'nada' || ${str:0:1} == "-" || $str =~ $re || ! "$str" =~ $regData ]]; then
+        str=${arrayOpc['e']}
+        regData='^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)) +(0?[1-9]|[12][0-9]|3[01]) +([01]?[0-9]|2[0-3]):[0-5][0-9]'
+        if [["$str" =~ $regData ]]; then
             echo "Argumento de '-e' não foi preenchido, foi introduzido argumento inválido ou chamou sem '-' atrás da opção passada." >&2
-            opcoes
+            menu
             exit 1
         fi
         ;;
     u) #Seleção de processos a visualizar através do nome do utilizador
-        str=${argOpt['u']}
-        if [[ $str == 'nada' || ${str:0:1} == "-" || $str =~ $re ]]; then
-            echo "Argumento de '-u' não foi preenchido, foi introduzido argumento inválido ou chamou sem '-' atrás da opção passada." >&2
-            opcoes
-            opcoes exit 1
-        fi
+        str=${arrayOpc['u']}
         ;;
     p) #Número de processos a visualizar
-        if ! [[ ${argOpt['p']} =~ $re ]]; then
-            echo "Argumento de '-p' tem de ser um número ou chamou sem '-' atrás da opção passada." >&2
-            opcoes
-            exit 1
-        fi
+        str=${arrayOpc['p']}
         ;;
-    r) #Ordenação reversa
+    r)
 
-        ;;
-    m | t | d | w)
-
-        if [[ $i = 1 ]]; then
+        if [[ $ordem = 2 ]]; then
             #Quando há mais que 1 argumento de ordenacao
-            opcoes
+            menu
             exit 1
         else
             #Se algum argumento for de ordenacao i=1
-            i=1
+            ordem=1
         fi
         ;;
+    w)
+
+        if [[ $ordem = 1 ]]; then
+            #Quando há mais que 1 argumento de ordenacao
+            menu
+            exit 1
+        else
+            #Se algum argumento for de ordenacao i=1
+            ordem=2
+        fi
+        ;;
+    m) 
+        str=${arrayOpc['m']}
+        ;;
+    M) 
+        str=${arrayOpc['M']}
+        ;;
+    
 
     *) #Passagem de argumentos inválidos
-        opcoes
+        menu
         exit 1
         ;;
     esac
 
 done
+
 
 #--------------------not done yet----------------------------------
 
