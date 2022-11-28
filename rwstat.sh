@@ -22,9 +22,8 @@ declare -A arrayRChar=() # Guarda as linhas rchar
 declare -A arrayWChar=() # Guarda as linhas wchar
 
 i=0 #iniciação da variável i, usada na condição de verificação de opçoes de ordenac
-re='^[0-9]+([.][0-9]+)?$'
 
-function usage() { # Menu de execução do programa.
+function menu() { # Menu de execução do programa.
     echo "Menu de Uso e Execução do Programa."
     echo "    -c         : Seleção  dos  processos  a  visualizar  pode  ser  realizada através de uma expressão regular."
     echo "    -s          : Seleção de processos a visualizar num periodo temporal - data mínima"
@@ -37,6 +36,84 @@ function usage() { # Menu de execução do programa.
     echo "    -w          : Ordenação da tabela por valores de escrita"
 
 }
+
+#Tratamentos das opçoes passadas como argumentos
+while getValues "::u:se:mcwrcp" option; do
+
+    #Adicionar ao array argOpt as opcoes passadas ao correr o procstat.sh, caso existam adiciona as que são passadas, caso não, adiciona "nada"
+    if [[ -z "$OPTARG" ]]; then
+        argOpt[$option]="blank"
+    else
+        argOpt[$option]=${OPTARG}
+    fi
+
+    case $option in
+    c) #Seleção de processos a utilizar atraves de uma expressão regular
+        str=${argOpt['c']}
+        if [[ $str == 'nada' || ${str:0:1} == "-" || $str =~ $re ]]; then
+            echo "Argumento de '-c' não foi preenchido, foi introduzido argumento inválido ou chamou sem '-' atrás da opção passada." >&2
+            menu
+            exit 1
+        fi
+        ;;
+    s) #Seleção de processos a visualizar num periodo temporal - data mínima
+        str=${argOpt['s']}
+        regData='^((Jan(uary)?|Feb(ruary)?|Mar(ch)?|Apr(il)?|May|Jun(e)?|Jul(y)?|Aug(ust)?|Sep(tember)?|Oct(ober)?|Nov(ember)?|Dec(ember)?)) +[0-9]{1,2} +[0-9]{1,2}:[0-9]{1,2}'
+        if [[ $str == 'nada' || ${str:0:1} == "-" || $str =~ $re || ! "$str" =~ $regData ]]; then
+            echo "Argumento de '-s' não foi preenchido, foi introduzido argumento inválido ou chamou sem '-' atrás da opção passada." >&2
+            meu
+            exit 1
+        fi
+        ;;
+    e) #Seleção de processos a visualizar num periodo temporal - data máxima
+        str=${argOpt['e']}
+        regData='^((Jan(uary)?|Feb(ruary)?|Mar(ch)?|Apr(il)?|May|Jun(e)?|Jul(y)?|Aug(ust)?|Sep(tember)?|Oct(ober)?|Nov(ember)?|Dec(ember)?)) +[0-9]{1,2} +[0-9]{1,2}:[0-9]{1,2}'
+        if [[ $str == 'nada' || ${str:0:1} == "-" || $str =~ $re || ! "$str" =~ $regData ]]; then
+            echo "Argumento de '-e' não foi preenchido, foi introduzido argumento inválido ou chamou sem '-' atrás da opção passada." >&2
+            opcoes
+            exit 1
+        fi
+        ;;
+    u) #Seleção de processos a visualizar através do nome do utilizador
+        str=${argOpt['u']}
+        if [[ $str == 'nada' || ${str:0:1} == "-" || $str =~ $re ]]; then
+            echo "Argumento de '-u' não foi preenchido, foi introduzido argumento inválido ou chamou sem '-' atrás da opção passada." >&2
+            opcoes
+            opcoes exit 1
+        fi
+        ;;
+    p) #Número de processos a visualizar
+        if ! [[ ${argOpt['p']} =~ $re ]]; then
+            echo "Argumento de '-p' tem de ser um número ou chamou sem '-' atrás da opção passada." >&2
+            opcoes
+            exit 1
+        fi
+        ;;
+    r) #Ordenação reversa
+
+        ;;
+    m | t | d | w)
+
+        if [[ $i = 1 ]]; then
+            #Quando há mais que 1 argumento de ordenacao
+            opcoes
+            exit 1
+        else
+            #Se algum argumento for de ordenacao i=1
+            i=1
+        fi
+        ;;
+
+    *) #Passagem de argumentos inválidos
+        opcoes
+        exit 1
+        ;;
+    esac
+
+done
+
+#--------------------not done yet----------------------------------
+
 function getTable() { # Função principal do programa. Obtém os valores desejados, ordena-os e imprimi-os.
     for net in /sys/class/net/[[:alnum:]]*; do # Procurar por todas as interfaces de rede disponiveis.
         if [[ -r $net/statistics ]]; then 
