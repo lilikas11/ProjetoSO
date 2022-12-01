@@ -39,7 +39,7 @@ function menu() { # Menu de execução do programa.
 }
 
 #Tratamentos das opçoes passadas como argumentos
-while getopts "::u:se:mcwrcp" option; do
+while getopts "c:s:e:u:m:M:rw" option; do
 
     #Adicionar ao array argOpt as opcoes passadas ao correr o procstat.sh, caso existam adiciona as que são passadas, caso não, adiciona "nada"
     if [[ -z "$OPTARG" ]]; then
