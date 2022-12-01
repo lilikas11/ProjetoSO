@@ -17,16 +17,19 @@
 # Inicialização de Arrays
 
 function menu() { # Menu de execução do programa.
-    echo "Menu de Uso e Execução do Programa."
-    echo "    -c         : Seleção  dos  processos  a  visualizar  pode  ser  realizada através de uma expressão regular."
-    echo "    -s          : Seleção de processos a visualizar num periodo temporal - data mínima"
-    echo "    -e          : Seleção de processos a visualizar num periodo temporal - data máxima"
-    echo "    -u          : Seleção de processos a visualizar através do nome do utilizador"
-    echo "    -m          : Seleção de processos a visualizar através de uma gama de pids"
-    echo "    -M          : Seleção de processos a visualizar através de uma gama de pids"
-    echo "    -p          : Número de processos a visualizar"
-    echo "    -r          : Ordenação reversa"
-    echo "    -w          : Ordenação da tabela por valores de escrita"
+    echo "------------------------  Menu de Execução do Programa  ------------------------"
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~  Filtros  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo " -c  -----> Seleção  dos  processos  a  visualizar  pode  ser  realizada através de uma expressão regular."
+    echo " -s  -----> Seleção de processos a visualizar num periodo temporal - data mínima"
+    echo " -e  -----> Seleção de processos a visualizar num periodo temporal - data máxima"
+    echo " -u  -----> Seleção de processos a visualizar através do nome do utilizador"
+    echo " -m  -----> Seleção de processos a visualizar através de uma gama de pids"
+    echo " -M  -----> Seleção de processos a visualizar através de uma gama de pids"
+    echo " -p  -----> Número de processos a visualizar"
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~  Ordenação (Escolher apenas uma)  ~~~~~~~~~~~~~~~~~~~~~"
+    echo " -r  -----> Ordenação reversa"
+    echo " -w  -----> Ordenação da tabela por valores de escrita"
+    echo " NOTA: o último argumento terá de ser número de segundos"
 
 }
 menu
