@@ -171,7 +171,8 @@ while getopts "c:s:e:u:m:M:rw" option; do
     w)
         WOrdem=1
         ;;
-    *) #Passagem de argumentos inválidos
+    *)
+        #O argumento passado não está listado
         echo "insira uma das opções listadas" >&2
         echo
         menu
@@ -190,9 +191,20 @@ if ! [[ ${@: -1} =~ $regexNum ]]; then
     exit 1
 fi
 
-if [[ $reverse=1 && $WOrdem=1 ]]; then
+if [[ "$reverse" -eq 1 && "$WOrdem" -eq 1 ]]; then
     echo "ERRO --> Insira apenas uma ordem"
     echo
     menu
     exit 1
 fi
+
+#---------------------leitura de rchar e wchar---------------
+function processos() {
+
+    #ciclo for para ler todos os ficheiro dentro do diretório
+    search_dir= cd /proc 
+    for entry in $(ls -a $search_dir); do
+        echo $entry
+    done
+
+}
