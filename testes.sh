@@ -22,16 +22,19 @@ declare -A arrayOpc=()   # Array Associativo: Guarda a informação das opções
 declare -A arrayRChar=() # Guarda as linhas rchar
 declare -A arrayWChar=() # Guarda as linhas wchar
 
-#-----------Defenir variaveis-------------
+#-----------Definir variaveis-------------
+
 TodayDate=$(date +"%s") #data atual em segundos
-regexString='^[0-9]+$'
+regexNum='^[0-9]+$'
 regexDate='^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)) +(0?[1-9]|[12][0-9]|3[01]) +([01]?[0-9]|2[0-3]):[0-5][0-9]'
+reverse=0
+WOrdem=0
 
 #----------menu---------------
 function menu() { # Menu de execução do programa.
     echo "------------------------  Menu de Execução do Programa  ------------------------"
     echo
-    echo "        ~~~~~~~~~~~~~~~~  Filtros  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        "
+    echo "             ~~~~~~~~~~~~~~~~~~~~~ Filtros  ~~~~~~~~~~~~~~~~~~~~~~      "
     echo " -c  -----> Seleção  dos  processos  a  visualizar  pode  ser  realizada através de uma expressão regular."
     echo " -s  -----> Seleção de processos a visualizar num periodo temporal - data mínima"
     echo " -e  -----> Seleção de processos a visualizar num periodo temporal - data máxima"
@@ -45,6 +48,7 @@ function menu() { # Menu de execução do programa.
     echo " -w  -----> Ordenação da tabela por valores de escrita"
     echo
     echo " NOTA: o último argumento terá de ser o número de segundos pertendido"
+    echo "-----------------------------------------------------------------------------"
 
 }
 
@@ -71,7 +75,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
     case $option in
     c)
         #verifica se é uma string
-        if ! [[ $OPTARG =~ $regexString ]]; then
+        if ! [[ $OPTARG =~ $regexNum ]]; then
             echo "ERRO --> Insira uma expressão válida" >&2
             echo
             menu
@@ -110,7 +114,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
 
     u)
         #verifica se é uma string
-        if ! [[ $OPTARG =~ $regexString ]]; then
+        if ! [[ $OPTARG =~ $regexNum ]]; then
             echo "ERRO --> Insira um nome de utilizador válido" >&2
             echo
             menu
@@ -123,7 +127,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
 
     m)
         #verifica se é um número
-        if [[ $OPTARG =~ $regexString ]]; then
+        if [[ $OPTARG =~ $regexNum ]]; then
             echo "ERRO --> Insira um PID válido" >&2
             echo
             menu
@@ -136,7 +140,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
 
     M)
         #verifica se é um número
-        if [[ $OPTARG =~ $regexString ]]; then
+        if [[ $OPTARG =~ $regexNum ]]; then
             echo "ERRO --> Insira um PID válido" >&2
             echo
             menu
@@ -149,7 +153,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
 
     p)
         #verifica se é um número
-        if [[ $OPTARG =~ $regexString ]]; then
+        if [[ $OPTARG =~ $regexNum ]]; then
             echo "ERRO --> Insira uma número de processos válido" >&2
             echo
             menu
@@ -165,7 +169,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
         ;;
 
     w)
-        Wordem=1
+        WOrdem=1
         ;;
     *) #Passagem de argumentos inválidos
         echo "insira uma das opções listadas" >&2
@@ -178,9 +182,18 @@ done
 
 # ---------------- Validação dos argumetos passados --------------------
 
-# Verifica se o ultimo argumento é um número
-if ! [[ ${@: -1} =~ $regexString ]]; then
-    echo "Insira como último argumento o número de segundos que pertende"
+# Verifica se é passado como ultimo argumento o número de segundos
+if ! [[ ${@: -1} =~ $regexNum ]]; then
+    echo "ERRO --> Insira como último argumento o número de segundos que pertende"
+    echo
     menu
     exit 1
 fi
+
+if [[ $reverse=1 && $WOrdem=1 ]]; then
+    echo "ERRO --> Insira apenas uma ordem"
+    echo
+    menu
+    exit 1
+fi
+
