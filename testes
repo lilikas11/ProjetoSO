@@ -25,10 +25,14 @@ declare -A arrayWChar=() # Guarda as linhas wchar
 #-----------Definir variaveis-------------
 
 TodayDate=$(date +"%s") #data atual em segundos
-regexNum='^[0-9]+$'
-regexDate='^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)) +(0?[1-9]|[12][0-9]|3[01]) +([01]?[0-9]|2[0-3]):[0-5][0-9]'
+regexNum='^[0-9]+([.][0-9]+)?$'
+regexDate='^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)) +[0-9]{1,2} +[0-9]{1,2}:[0-9]{1,2}'
 reverse=0
 WOrdem=0
+regexProc=/proc/
+gamPidMin=0
+gamPidMax=32768
+gamPIdMax=4194304
 
 #----------menu---------------
 function menu() { # Menu de execução do programa.
@@ -75,7 +79,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
     case $option in
     c)
         #verifica se é uma string
-        if ! [[ $OPTARG =~ $regexNum ]]; then
+        if [[ $OPTARG =~ $regexNum ]]; then
             echo "ERRO --> Insira uma expressão válida" >&2
             echo
             menu
@@ -88,8 +92,9 @@ while getopts "c:s:e:u:m:M:rw" option; do
 
     s)
         #verifica se é uma data
-        if ! [[ $OPTARG =~ $regexDate ]]; then
+        if ! [[ "$OPTARG" =~ $regexDate ]]; then
             echo "ERRO --> Insira uma data válida" >&2
+            echo $OPTARG
             echo
             menu
             exit 1
@@ -114,7 +119,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
 
     u)
         #verifica se é uma string
-        if ! [[ $OPTARG =~ $regexNum ]]; then
+        if [[ $OPTARG =~ $regexNum ]]; then
             echo "ERRO --> Insira um nome de utilizador válido" >&2
             echo
             menu
@@ -127,7 +132,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
 
     m)
         #verifica se é um número
-        if [[ $OPTARG =~ $regexNum ]]; then
+        if ! [[ $OPTARG =~ $regexNum ]]; then
             echo "ERRO --> Insira um PID válido" >&2
             echo
             menu
@@ -140,7 +145,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
 
     M)
         #verifica se é um número
-        if [[ $OPTARG =~ $regexNum ]]; then
+        if ! [[ $OPTARG =~ $regexNum ]]; then
             echo "ERRO --> Insira um PID válido" >&2
             echo
             menu
@@ -153,7 +158,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
 
     p)
         #verifica se é um número
-        if [[ $OPTARG =~ $regexNum ]]; then
+        if ! [[ $OPTARG =~ $regexNum ]]; then
             echo "ERRO --> Insira uma número de processos válido" >&2
             echo
             menu
@@ -202,9 +207,20 @@ fi
 function processos() {
 
     #ciclo for para ler todos os ficheiro dentro do diretório
-    search_dir= cd /proc 
-    for entry in $(ls -a $search_dir); do
-        echo $entry
+    cd /proc
+    for PID in $(ls -a); do
+        #filtrar os ficheiros que não estão no format /proc/[PID]
+        if [[ "$PID" =~ $regexNum && "$PID" -ge $gamPidMin && "$PID" -le $gamPidMax ]]; then
+            echo $PID
+            #ver se a file io e comm existe no diretorio PID
+            if [[ -f "$PID/io" && -f "$PID/comm" ]]; then
+                #ver se as files estão no modo reed
+                if [[ -r "$PID/io" && -r "$PID/comm" ]]; then
+                    echo puta
+                fi
+            fi
+        fi
     done
 
 }
+processos
