@@ -95,7 +95,6 @@ while getopts "c:s:e:u:m:M:rw" option; do
         #verifica se é uma data
         if ! [[ "$OPTARG" =~ $regexDate ]]; then
             echo "ERRO --> Insira uma data válida" >&2
-            echo $OPTARG
             echo
             menu
             exit 1
@@ -210,14 +209,11 @@ function processos() {
     #ciclo for para ler todos os ficheiro dentro do diretório
     cd /proc
     for PID in $(ls -a); do
-        #filtrar os ficheiros que não estão no format /proc/[PID]
+        #filtrar os ficheiros que não estão no format /proc/[PID] e ver se está dentro da gama de pids sugerido
         if [[ "$PID" =~ $regexNum && "$PID" -ge $gamPidMin && "$PID" -le $gamPidMax ]]; then
-            #ver se a file io e comm existe no diretorio PID
-            if [[ -f "$PID/io" && -f "$PID/comm" ]]; then
-                #ver se as files estão no modo reed
-                if [[ -r "$PID/io" && -r "$PID/comm" ]]; then
-                    echo $PID
-                fi
+            #ver se a file io e comm existe e estão no mode reed no diretorio PID
+            if [[ -f "$PID/io" && -f "$PID/comm" && -r "$PID/io" && -r "$PID/comm" ]]; then
+                echo $PID
             fi
         fi
     done
