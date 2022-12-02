@@ -31,9 +31,12 @@ reverse=0
 WOrdem=0
 regexProc=/proc/
 gamPidMin=0
-#TODO:fazer a cena do sistema 32 bits e 64 bits
-gamPidMax=32768
-gamPIdMax=4194304
+#aqui vemos se o sistema é de 32 ou 64 bits para sabermos qual é o maimo PID que podemos ter
+if [ "$(uname -m | grep '64')" != "" ]; then
+  gamPIdMax=4194304
+else
+  gamPidMax=32768
+fi
 
 #----------menu---------------
 function menu() { # Menu de execução do programa.
