@@ -26,7 +26,7 @@ declare -A arrayWChar=() # Guarda as linhas wchar
 
 TodayDate=$(date +"%s") #data atual em segundos
 regexNum='^[0-9]+([.][0-9]+)?$'
-regexDate='^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)) +[0-9]{1,2} +[0-9]{1,2}:[0-9]{1,2}'
+regexDate='^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)) +(0?[1-9]|[12][0-9]|3[01]) +([01]?[0-9]|2[0-3]):[0-5][0-9]'
 reverse=0
 WOrdem=0
 regexProc=/proc/
@@ -211,12 +211,11 @@ function processos() {
     for PID in $(ls -a); do
         #filtrar os ficheiros que não estão no format /proc/[PID]
         if [[ "$PID" =~ $regexNum && "$PID" -ge $gamPidMin && "$PID" -le $gamPidMax ]]; then
-            echo $PID
             #ver se a file io e comm existe no diretorio PID
             if [[ -f "$PID/io" && -f "$PID/comm" ]]; then
                 #ver se as files estão no modo reed
                 if [[ -r "$PID/io" && -r "$PID/comm" ]]; then
-                    echo puta
+                    echo $PID
                 fi
             fi
         fi
