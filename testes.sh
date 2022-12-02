@@ -16,8 +16,18 @@
 
 # Inicialização de Arrays
 
-#expReg = "*"
+#Arrays
+declare -A arrayPID=()   # Array Associativo: Guarda as informações de cada processo, sendo a 'key' o PID
+declare -A arrayOpc=()   # Array Associativo: Guarda a informação das opções passadas como argumentos na chamada da função
+declare -A arrayRChar=() # Guarda as linhas rchar
+declare -A arrayWChar=() # Guarda as linhas wchar
 
+#-----------Defenir variaveis-------------
+TodayDate=$(date +"%s") #data atual em segundos
+regexString='^[0-9]+$'
+regexDate='^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)) +(0?[1-9]|[12][0-9]|3[01]) +([01]?[0-9]|2[0-3]):[0-5][0-9]'
+
+#----------menu---------------
 function menu() { # Menu de execução do programa.
     echo "------------------------  Menu de Execução do Programa  ------------------------"
     echo
@@ -26,8 +36,8 @@ function menu() { # Menu de execução do programa.
     echo " -s  -----> Seleção de processos a visualizar num periodo temporal - data mínima"
     echo " -e  -----> Seleção de processos a visualizar num periodo temporal - data máxima"
     echo " -u  -----> Seleção de processos a visualizar através do nome do utilizador"
-    echo " -m  -----> Seleção de processos a visualizar através de uma gama de pids"
-    echo " -M  -----> Seleção de processos a visualizar através de uma gama de pids"
+    echo " -m  -----> Seleção de processos a visualizar através de uma gama de pids - minimo"
+    echo " -M  -----> Seleção de processos a visualizar através de uma gama de pids - máximo"
     echo " -p  -----> Número de processos a visualizar"
     echo
     echo "        ~~~~~~~~~~~~~~~~  Ordenação (Escolher apenas uma)  ~~~~~~~~~~~~~        "
@@ -37,8 +47,11 @@ function menu() { # Menu de execução do programa.
     echo " NOTA: o último argumento terá de ser o número de segundos pertendido"
 
 }
+
+#----------guardar e validar opcoes--------------
 while getopts "c:s:e:u:m:M:rw" option; do
 
+    #confere se o argumento passado não é uma suposta opção
     if [[ ${OPTARG:0:1} == - ]]; then
         echo "ERRO --> A opcao -$option requer um argumento"
         echo
@@ -53,14 +66,120 @@ while getopts "c:s:e:u:m:M:rw" option; do
         arrayOpc[$option]=${OPTARG}
     fi
 
-    echo ${OPTARG:0:1}
+    #----Tratamento de opcoes---
 
+    case $option in
+    c)
+        #verifica se é uma string
+        if ! [[ $OPTARG =~ $regexString ]]; then
+            echo "ERRO --> Insira uma expressão válida" >&2
+            echo
+            menu
+            exit 1
+        fi
+
+        #Guarda a expressão regular
+        expReg=$OPTARG
+        ;;
+
+    s)
+        #verifica se é uma data
+        if ! [[ $OPTARG =~ $regexDate ]]; then
+            echo "ERRO --> Insira uma data válida" >&2
+            echo
+            menu
+            exit 1
+        fi
+
+        #Guarda a data minima
+        dateMin=$OPTARG
+        ;;
+
+    e)
+        #verifica se é uma data
+        if ! [[ $OPTARG =~ $regexDate ]]; then
+            echo "ERRO --> Insira uma data válida" >&2
+            echo
+            menu
+            exit 1
+        fi
+
+        #Guarda a data maxima
+        dateMax=$OPTARG
+        ;;
+
+    u)
+        #verifica se é uma string
+        if ! [[ $OPTARG =~ $regexString ]]; then
+            echo "ERRO --> Insira um nome de utilizador válido" >&2
+            echo
+            menu
+            exit 1
+        fi
+
+        #Guarda o nome de utilizador
+        utilizador=$OPTARG
+        ;;
+
+    m)
+        #verifica se é um número
+        if [[ $OPTARG =~ $regexString ]]; then
+            echo "ERRO --> Insira um PID válido" >&2
+            echo
+            menu
+            exit 1
+        fi
+
+        #Guarda o PID
+        gamPidMin=$OPTARG
+        ;;
+
+    M)
+        #verifica se é um número
+        if [[ $OPTARG =~ $regexString ]]; then
+            echo "ERRO --> Insira um PID válido" >&2
+            echo
+            menu
+            exit 1
+        fi
+
+        #Guarda o PID
+        gamPidMax=$OPTARG
+        ;;
+
+    p)
+        #verifica se é um número
+        if [[ $OPTARG =~ $regexString ]]; then
+            echo "ERRO --> Insira uma número de processos válido" >&2
+            echo
+            menu
+            exit 1
+        fi
+
+        #Guarda o PID
+        nProc=$OPTARG
+        ;;
+
+    r)
+        reverse=1
+        ;;
+
+    w)
+        Wordem=1
+        ;;
+    *) #Passagem de argumentos inválidos
+        echo "insira uma das opções listadas" >&2
+        echo
+        menu
+        exit 1
+        ;;
+    esac
 done
 
 # ---------------- Validação dos argumetos passados --------------------
 
 # Verifica se o ultimo argumento é um número
-if ! [[ ${@: -1} =~ $re ]]; then
+if ! [[ ${@: -1} =~ $regexString ]]; then
     echo "Insira como último argumento o número de segundos que pertende"
     menu
     exit 1
