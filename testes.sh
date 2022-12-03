@@ -220,8 +220,8 @@ function processos() {
         #1.se a respetiva variavel existe
         #2.se existir, filtramos os ficheiros que não seguem as condições
 
-        #nome protocolo
-        XExpReg=$(cat $PID/comm)
+        #nome protocolo (temos de fazer 'trim' dos espaços porque à protocolos com mais de um nome)
+        XExpReg=$(cat $PID/comm | tr " " "_" )
         if [[ -n $expReg ]]; then
             if ! [[ $XExpReg =~ $expReg ]]; then
                 continue
@@ -252,6 +252,13 @@ function processos() {
             fi
         fi
 
+        #Guardar a informação no array associativo 2D:
+        #1Key --> PID do processo
+        #2key --> Informaçao que vamos guardar relativa ao PID
+        arrayPID[$Key, XExpReg]=$XExpReg
+        arrayPID[$Key, XUtilizador]=$XUtilizador
+        arrayPID[$Key, XDate]=$XDate
+
         #Guardar os valores de rchar e wchar
         rchar=$(cat $PID/io | grep rchar | tr -dc '0-9')
         wchar=$(cat $PID/io | grep wchar | tr -dc '0-9')
@@ -264,11 +271,25 @@ function processos() {
     sleep $LastArg
 
     #Buscar denovo os valores RChar e WChar para depois fazer as comparações
-    for PID in "${!arrayRChar[@]}"; do      #Nota: aqui usamos as keys do array: arrayRChar, mas poderiamos usar as keys do array: arrayWChar
-        echo $PID
-    done
-    
+    for PID in "${!arrayRChar[@]}"; do #Nota: aqui usamos as keys do array: arrayRChar, mas poderiamos usar as keys do array: arrayWChar
 
+        #rchar e wchar antes do sleep time
+        rcharOld=${allRchar[$index]}
+        wcharOld=${allWchar[$index]}
+
+        #rchar e wchar depois do sleep time
+        rcharNew=$(cat $PID/io | grep rchar | tr -dc '0-9')
+        wcharNew=$(cat $PID/io | grep wchar | tr -dc '0-9')
+
+        sub=$(($rchar2 - $rchar))
+        rater=$(echo "scale=2; $sub/$sleepTime" | bc -l) # por exemplo, rater = .33
+        rater=${rater/#./0.}                             #              rater = 0.33  => acrescenta o zero (uma questão de estética)
+
+        sub=$(($wchar2 - $wchar))
+        ratew=$(echo "scale=2; $sub/$sleepTime" | bc -l)
+        ratew=${ratew/#./0.}
+
+    done
 
 }
 

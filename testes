@@ -252,6 +252,13 @@ function processos() {
             fi
         fi
 
+
+        #Guardar a informação no array associativo 2D:
+        #1Key --> PID do processo
+        #2key --> Informaçao que vamos guardar relativa ao PID
+        arrayPID[$Key,XExpReg]=$XExpReg
+        echo ${arrayPID[$Key,XExpReg]}
+
         #Guardar os valores de rchar e wchar
         rchar=$(cat $PID/io | grep rchar | tr -dc '0-9')
         wchar=$(cat $PID/io | grep wchar | tr -dc '0-9')
@@ -263,9 +270,11 @@ function processos() {
     #damos o intervalo de tempo colacado pelo utilizador
     sleep $LastArg
 
-    for key in "${!arrayRChar[@]}"; do
-        echo $key
+    #Buscar denovo os valores RChar e WChar para depois fazer as comparações
+    for PID in "${!arrayRChar[@]}"; do      #Nota: aqui usamos as keys do array: arrayRChar, mas poderiamos usar as keys do array: arrayWChar
+        echo ${arrayPID[$PID]}
     done
+
 
 
 }
