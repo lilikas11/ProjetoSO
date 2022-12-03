@@ -31,8 +31,6 @@ reverse=0
 WOrdem=0
 gamPidMin=0
 
-data=$(date +"%s")
-echo $data
 #aqui vemos se o sistema operativo é de 32 ou 64 bits para sabermos qual é o maimo PID que podemos ter
 if [ "$(uname -m | grep '64')" != "" ]; then
     gamPidMax=4194304
@@ -105,6 +103,8 @@ while getopts "c:s:e:u:m:M:rw" option; do
         fi
 
         #Guarda a data minima
+        dateMin=$OPTARG
+        dateMin=$(date --date="$dateMin" +"%s")
         ;;
 
     e)
@@ -118,6 +118,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
 
         #Guarda a data maxima
         dateMax=$OPTARG
+        dateMax=$(date --date="$dateMax" +"%s")
         ;;
 
     u)
@@ -236,7 +237,6 @@ function processos() {
             continue
         fi
         
-        sDate=$(date --date="$startingDate" +"%s")
 
         echo $PID
 
