@@ -281,13 +281,13 @@ function processos() {
         rcharNew=$(cat $PID/io | grep rchar | tr -dc '0-9')
         wcharNew=$(cat $PID/io | grep wchar | tr -dc '0-9')
 
-        sub=$(($rchar2 - $rchar))
-        rater=$(echo "scale=2; $sub/$sleepTime" | bc -l) # por exemplo, rater = .33
-        rater=${rater/#./0.}                             #              rater = 0.33  => acrescenta o zero (uma questão de estética)
+        # sub=$(($rchar2 - $rchar))
+        # rater=$(echo "scale=2; $sub/$sleepTime" | bc -l) # por exemplo, rater = .33
+        # rater=${rater/#./0.}                             #              rater = 0.33  => acrescenta o zero (uma questão de estética)
 
-        sub=$(($wchar2 - $wchar))
-        ratew=$(echo "scale=2; $sub/$sleepTime" | bc -l)
-        ratew=${ratew/#./0.}
+        # sub=$(($wchar2 - $wchar))
+        # ratew=$(echo "scale=2; $sub/$sleepTime" | bc -l)
+        # ratew=${ratew/#./0.}
 
     done
 
