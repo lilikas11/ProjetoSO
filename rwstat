@@ -54,7 +54,7 @@ function menu() { # Menu de execução do programa.
     echo " -r  -----> Ordenação reversa"
     echo " -w  -----> Ordenação da tabela por valores de escrita"
     echo
-    echo " NOTA: o último argumento terá de ser o número de segundos pretendido"
+    echo " NOTA: o último argumento terá de ser o número de segundos pertendido"
     echo "-----------------------------------------------------------------------------"
 
 }
@@ -186,7 +186,7 @@ done
 
 # Verifica se é passado como ultimo argumento o número de segundos
 if ! [[ ${@: -1} =~ $regexNum ]]; then
-    echo "ERRO --> Insira como último argumento o número de segundos que pretende"
+    echo "ERRO --> Insira como último argumento o número de segundos que pertende"
     echo
     menu
     exit 1
@@ -264,12 +264,11 @@ function processos() {
         wchar=$(cat $PID/io | grep wchar | tr -dc '0-9')
         arrayPID[$PID,READB]=$rchar
         arrayPID[$PID,WRITEB]=$wchar
+        echo ${arrayPID[$PID,WRITEB]}
         arrayRChar[$PID]=$rchar
         arrayWChar[$PID]=$wchar
 
     done
-    
-    #TODO: TÁ TUDO BEM ATÉ AQUI
     echo "${arr[9889,COMM]}"
 
     #damos o intervalo de tempo colacado pelo utilizador
