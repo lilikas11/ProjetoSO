@@ -284,7 +284,7 @@ function processos() {
         wcharNew=$(cat $PID/io | grep wchar | tr -dc '0-9')
 
         #calcular o rateR
-        sub=$(($rcharNew-$rcharOld))
+        sub=$(($rcharNew - $rcharOld))
         rateR=$(echo "scale=2; $sub/$LastArg" | bc -l)
         #calcular o rateW
         sub=$wcharNew-$wcharOld
@@ -298,3 +298,23 @@ function processos() {
 
 }
 processos
+
+function print() {
+
+    #Começamos por ver o número de processos que vamos imprimir
+    #Se o utilizador não tiver definido nenhum nProc mostramos todos os processos
+    if ! [[ -n $nProc ]]; then
+        nProc=${#arrayRChar[@]}
+    fi
+
+    printf "%-30s %-20s %5s %15s %15s %15s %15s %15s %15s %16s\n" "COMM" "USER" "PID" "READB" "WRITEB" "RATER" "RATEW" "DATE"
+
+    for PID in "${!arrayRChar[@]}"; do
+
+        printf "%-30s %-20s %5s %15s %15s %15s %15s %15s %15s %8s %-1s %-1s \n" "${arrayPID[$PID, COMM]}" "${arrayPID[$PID, USER]}" "$PID" "${arrayPID[$PID, READB]}" "${arrayPID[$PID, WRITEB]}" "${arrayPID[$PID, RATER]}" "${arrayPID[$PID, RATEW]}" "${arrayPID[$PID, DATE]}" | head -n ${nProc}
+
+    done
+
+}
+
+print
