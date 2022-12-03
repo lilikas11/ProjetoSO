@@ -290,8 +290,11 @@ function processos() {
         sub=$(($wcharNew - $wcharOld))
         rateW=$(echo "scale=2; $sub/$LastArg" | bc -l)
 
+        #Guardar o rateR e o rateW no array de informação
+        arrayPID[$Key, RATER]=$rateR
+        arrayPID[$Key, RATEW]=$rateW
+
     done
 
 }
-
 processos
