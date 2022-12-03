@@ -229,28 +229,19 @@ function processos() {
 
         #nome protocolo
         XExpReg=$(cat $PID/comm)
-        if ! [[ $XExpReg =~ $expReg ]]; then
-            continue
+        if [[ -n $expReg ]]; then
+            if ! [[ $XExpReg =~ $expReg ]]; then
+                continue
+            fi
         fi
 
         #utilizador
         XUtilizador=$(ps -o user= -p $PID)
-        if ! [[ $XUtilizador == $utilizador ]]; then
-            continue
+        if [[ -n $utilizador ]]; then
+            if ! [[ $XUtilizador =~ $utilizador ]]; then
+                continue
+            fi
         fi
-
-        #data minima e data maxima
-        XDate=$(ps -o lstart= -p $PID)
-        DateSeg=$(date --date="$XDate" +"%s")
-        if ! [[ $DateSeg ge $DateMin ]]; then
-            continue
-        fi
-
-        if ! [[ $XDate ge $DateMax ]]; then
-            continue
-        fi
-
-        
 
         echo $PID
 
