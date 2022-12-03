@@ -236,7 +236,23 @@ function processos() {
             fi
         fi
 
-        #
+        #data minima e data maxima
+        LANG=en_us_8859_1
+        XDate=$(ps -o lstart= -p $PID)
+        dateSeg=$(date --date="$XDate" +"%s")
+        if [[ -n $dateMin ]]; then
+            if ! [[ $dateSeg -ge $dateMin ]]; then
+                continue
+            fi
+        fi
+
+        if [[ -n $dateMax ]]; then
+            if ! [[ $dateSeg -le $dateMax ]]; then
+                continue
+            fi
+        fi
+
+        #Guardar os valores de rchar e wchar
         rchar=$(cat $PID/io | grep rchar | tr -dc '0-9')
         wchar=$(cat $PID/io | grep wchar | tr -dc '0-9')
         arrayRChar[$PID]=$rchar
@@ -244,9 +260,14 @@ function processos() {
 
     done
 
+    #damos o intervalo de tempo colacado pelo utilizador
     sleep $LastArg
 
+    for key in "${!arrayRChar[@]}"; do
+        echo $key
+    done
 
 
 }
+
 processos

@@ -237,6 +237,7 @@ function processos() {
         fi
 
         #data minima e data maxima
+        LANG=en_us_8859_1
         XDate=$(ps -o lstart= -p $PID)
         dateSeg=$(date --date="$XDate" +"%s")
         if [[ -n $dateMin ]]; then
@@ -259,11 +260,15 @@ function processos() {
 
     done
 
+    #damos o intervalo de tempo colacado pelo utilizador
     sleep $LastArg
 
-    #TODO:Ver como se pega sṍ as keys
-
+    #Buscar denovo os valores RChar e WChar para depois fazer as comparações
+    for PID in "${!arrayRChar[@]}"; do      #Nota: aqui usamos as keys do array: arrayRChar, mas poderiamos usar as keys do array: arrayWChar
+        echo $PID
+    done
 
 
 }
+
 processos
