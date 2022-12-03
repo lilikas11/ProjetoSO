@@ -267,6 +267,7 @@ function processos() {
     for PID in "${!arrayRChar[@]}"; do      #Nota: aqui usamos as keys do array: arrayRChar, mas poderiamos usar as keys do array: arrayWChar
         echo $PID
     done
+    
 
 
 }
