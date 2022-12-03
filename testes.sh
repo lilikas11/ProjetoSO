@@ -67,7 +67,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
     if [[ ${OPTARG:0:1} == - ]]; then
         echo "ERRO --> A opcao -$option requer um argumento"
         echo
-        $(date +"%s") exit 1
+        exit 1
     fi
 
     #Adiciona os value passados ao array argOpc com key option, caso nada seja passado adiciona o value "empty"
@@ -228,14 +228,28 @@ function processos() {
         #2.se existir, filtramos os ficheiros que não seguem as condições
 
         #nome protocolo
-        if ! [[ $(cat $PID/comm) =~ $expReg ]]; then
+        XExpReg=$(cat $PID/comm)
+        if ! [[ $XExpReg =~ $expReg ]]; then
             continue
         fi
 
         #utilizador
-        if ! [[ $(ps -o user= -p $PID) == $utilizador ]]; then
+        XUtilizador=$(ps -o user= -p $PID)
+        if ! [[ $XUtilizador == $utilizador ]]; then
             continue
         fi
+
+        #data minima e data maxima
+        XDate=$(ps -o lstart= -p $PID)
+        DateSeg=$(date --date="$XDate" +"%s")
+        if ! [[ $DateSeg ge $DateMin ]]; then
+            continue
+        fi
+
+        if ! [[ $XDate ge $DateMax ]]; then
+            continue
+        fi
+
         
 
         echo $PID
