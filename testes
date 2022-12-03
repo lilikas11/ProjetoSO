@@ -30,6 +30,9 @@ regexDate='^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)) +(0?[1-9]|[12][0
 reverse=0
 WOrdem=0
 gamPidMin=0
+
+data=$(date +"%s")
+echo $data
 #aqui vemos se o sistema operativo é de 32 ou 64 bits para sabermos qual é o maimo PID que podemos ter
 if [ "$(uname -m | grep '64')" != "" ]; then
     gamPidMax=4194304
@@ -66,8 +69,7 @@ while getopts "c:s:e:u:m:M:rw" option; do
     if [[ ${OPTARG:0:1} == - ]]; then
         echo "ERRO --> A opcao -$option requer um argumento"
         echo
-        menu
-        exit 1
+$(date +"%s")        exit 1
     fi
 
     #Adiciona os value passados ao array argOpc com key option, caso nada seja passado adiciona o value "empty"
@@ -225,7 +227,12 @@ function processos() {
         #2.se existir, filtramos os ficheiros que não seguem as condições
 
         #nome protocolo
-        if ! [[ $(cat $PID/comm) =~  $expReg ]]; then
+        if ! [[ $(cat $PID/comm) =~ $expReg ]]; then
+            continue
+        fi
+
+        #utilizador
+        if ! [[ $(ps -o user= -p $PID) == $utilizador ]]; then
             continue
         fi
 
