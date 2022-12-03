@@ -268,9 +268,10 @@ function processos() {
         arrayWChar[$PID]=$wchar
 
     done
-    
+
     #TODO: TÁ TUDO BEM ATÉ AQUI
-    echo "${arr[9889,COMM]}"
+    PID=9889
+    echo "${arr[$PID,COMM]}"
 
     #damos o intervalo de tempo colacado pelo utilizador
     sleep $LastArg
