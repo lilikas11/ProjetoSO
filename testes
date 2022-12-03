@@ -29,13 +29,12 @@ regexNum='^[0-9]+([.][0-9]+)?$'
 regexDate='^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)) +(0?[1-9]|[12][0-9]|3[01]) +([01]?[0-9]|2[0-3]):[0-5][0-9]'
 reverse=0
 WOrdem=0
-regexProc=/proc/
 gamPidMin=0
 #aqui vemos se o sistema operativo é de 32 ou 64 bits para sabermos qual é o maimo PID que podemos ter
 if [ "$(uname -m | grep '64')" != "" ]; then
-  gamPidMax=4194304
+    gamPidMax=4194304
 else
-  gamPidMax=32768
+    gamPidMax=32768
 fi
 
 #----------menu---------------
@@ -104,7 +103,6 @@ while getopts "c:s:e:u:m:M:rw" option; do
         fi
 
         #Guarda a data minima
-        dateMin=$OPTARG
         ;;
 
     e)
@@ -213,12 +211,34 @@ function processos() {
     cd /proc
     for PID in $(ls -a); do
         #filtrar os ficheiros que não estão no format /proc/[PID] e ver se está dentro da gama de pids sugerido
-        if [[ "$PID" =~ $regexNum && "$PID" -ge $gamPidMin && "$PID" -le $gamPidMax ]]; then
-            #ver se a file io e comm existe e estão no mode reed no diretorio PID
-            if [[ -f "$PID/io" && -f "$PID/comm" && -r "$PID/io" && -r "$PID/comm" ]]; then
-                echo $PID
-            fi
+        if ! [[ "$PID" =~ $regexNum && "$PID" -ge $gamPidMin && "$PID" -le $gamPidMax ]]; then
+            continue
         fi
+
+        #ver se a file io e comm existe e estão no mode reed no diretorio PID
+        if ! [[ -f "$PID/io" && -f "$PID/comm" && -r "$PID/io" && -r "$PID/comm" ]]; then
+            continue
+        fi
+
+        #Agora para cada opção (c, s, e, u) vemos se:
+        #1.se a respetiva variavel existe
+        #2.se existir, filtramos os ficheiros que não seguem as condições
+
+        #nome protocolo
+        if ! [[ $(cat $PID/comm) =~  $expReg ]]; then
+            continue
+        fi
+
+        echo $PID
+
+        # if ! [[ ($pComm =~ $comm) && ($pUser == $user) && ($dateTS -gt $sDate) && ($dateTS -lt $eDate) ]]; then
+        #     continue
+        # fi
+
+        # if ! [[ "${processID[@]}" =~ "$k" ]]; then
+        #     processID[index]=$k
+        #     ((index++))
+        # fi
     done
 
 }
