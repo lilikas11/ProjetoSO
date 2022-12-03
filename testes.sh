@@ -18,7 +18,6 @@
 
 #Arrays
 declare -A arrayPID=()   # Array Associativo: Guarda as informações de cada processo, sendo a 'key' o PID
-declare -A arrayOpc=()   # Array Associativo: Guarda a informação das opções passadas como argumentos na chamada da função
 declare -A arrayRChar=() # Guarda as linhas rchar
 declare -A arrayWChar=() # Guarda as linhas wchar
 
@@ -68,13 +67,6 @@ while getopts "c:s:e:u:m:M:rw" option; do
         echo "ERRO --> A opcao -$option requer um argumento"
         echo
         exit 1
-    fi
-
-    #Adiciona os value passados ao array argOpc com key option, caso nada seja passado adiciona o value "empty"
-    if [[ -z "$OPTARG" ]]; then
-        arrayOpc[$option]=empty
-    else
-        arrayOpc[$option]=${OPTARG}
     fi
 
     #----Tratamento de opcoes---
@@ -199,6 +191,7 @@ if ! [[ ${@: -1} =~ $regexNum ]]; then
     menu
     exit 1
 fi
+LastArg=${@: -1}
 
 if [[ "$reverse" -eq 1 && "$WOrdem" -eq 1 ]]; then
     echo "ERRO --> Insira apenas uma ordem"
@@ -243,17 +236,34 @@ function processos() {
             fi
         fi
 
-        echo $PID
+        #data minima e data maxima
+        XDate=$(ps -o lstart= -p $PID)
+        dateSeg=$(date --date="$XDate" +"%s")
+        if [[ -n $dateMin ]]; then
+            if ! [[ $dateSeg -ge $dateMin ]]; then
+                continue
+            fi
+        fi
 
-        # if ! [[ ($pComm =~ $comm) && ($pUser == $user) && ($dateTS -gt $sDate) && ($dateTS -lt $eDate) ]]; then
-        #     continue
-        # fi
+        if [[ -n $dateMax ]]; then
+            if ! [[ $dateSeg -le $dateMax ]]; then
+                continue
+            fi
+        fi
 
-        # if ! [[ "${processID[@]}" =~ "$k" ]]; then
-        #     processID[index]=$k
-        #     ((index++))
-        # fi
+        #Guardar os valores de rchar e wchar
+        rchar=$(cat $PID/io | grep rchar | tr -dc '0-9')
+        wchar=$(cat $PID/io | grep wchar | tr -dc '0-9')
+        arrayRChar[$PID]=$rchar
+        arrayWChar[$PID]=$wchar
+
     done
+
+    sleep $LastArg
+
+    #TODO:Ver como se pega sṍ as keys
+
+
 
 }
 processos
