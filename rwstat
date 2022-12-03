@@ -191,7 +191,7 @@ if ! [[ ${@: -1} =~ $regexNum ]]; then
     menu
     exit 1
 fi
-LastArg=${@: -1}
+LastArg="${@: -1}"
 
 if [[ "$reverse" -eq 1 && "$WOrdem" -eq 1 ]]; then
     echo "ERRO --> Insira apenas uma ordem"
@@ -255,23 +255,19 @@ function processos() {
         #Guardar a informação no array associativo 2D:
         #1Key --> PID do processo
         #2key --> Informaçao que vamos guardar relativa ao PID
-        arrayPID[$PID,COMM]=$XExpReg
-        arrayPID[$PID,USER]=$XUtilizador
-        arrayPID[$PID,DATE]=$XDate
+        arrayPID[$PID, COMM]=$XExpReg
+        arrayPID[$PID, USER]=$XUtilizador
+        arrayPID[$PID, DATE]=$XDate
 
         #Guardar os valores de rchar e wchar
         rchar=$(cat $PID/io | grep rchar | tr -dc '0-9')
         wchar=$(cat $PID/io | grep wchar | tr -dc '0-9')
-        arrayPID[$PID,READB]=$rchar
-        arrayPID[$PID,WRITEB]=$wchar
+        arrayPID[$PID, READB]=$rchar
+        arrayPID[$PID, WRITEB]=$wchar
         arrayRChar[$PID]=$rchar
         arrayWChar[$PID]=$wchar
 
     done
-
-    #TODO: TÁ TUDO BEM ATÉ AQUI
-    PID=9889
-    echo "${arr[$PID,COMM]}"
 
     #damos o intervalo de tempo colacado pelo utilizador
     sleep $LastArg
@@ -280,27 +276,25 @@ function processos() {
     for PID in "${!arrayRChar[@]}"; do #Nota: aqui usamos as keys do array: arrayRChar, mas poderiamos usar as keys do array: arrayWChar
 
         #rchar e wchar antes do sleep time
-        rcharOld=${allRchar[$PID]}
-        wcharOld=${allWchar[$PID]}
+        rcharOld=${arrayRChar[$PID]}
+        wcharOld=${arrayWChar[$PID]}
 
         #rchar e wchar depois do sleep time
         rcharNew=$(cat $PID/io | grep rchar | tr -dc '0-9')
         wcharNew=$(cat $PID/io | grep wchar | tr -dc '0-9')
 
         #calcular o rateR
-        sub=$rcharNew-$rcharOld
-        rateR=$(echo "scale=2; $sub/$LasArg" | bc -l) # por exemplo, rater = .33
+        sub=$(($rcharNew-$rcharOld))
+        rateR=$(echo "scale=2; $sub/$LastArg" | bc -l)
         #calcular o rateW
         sub=$wcharNew-$wcharOld
         rateW=$(echo "scale=2; $sub/$LastArg" | bc -l)
 
         #Guardar o rateR e o rateW no array de informação
-        arrayPID[$PID,RATER]=$rateR
-        arrayPID[$PID,RATEW]=$rateW
+        arrayPID[$PID, RATER]=$rateR
+        arrayPID[$PID, RATEW]=$rateW
 
     done
 
 }
 processos
-echo "${arr[9889,COMM]}"
-
